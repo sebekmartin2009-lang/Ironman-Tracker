@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Ironman Tracker">
 <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Ironman%20Tracker%22%2C%22short_name%22%3A%22Ironman%22%2C%22start_url%22%3A%22%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0f%22%2C%22theme_color%22%3A%22%23ff3d3d%22%2C%22orientation%22%3A%22portrait%22%7D">
 
-<title>IRONMAN TRACKER</title>
+<title>IRONMAN TRACKER v4</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 [data-theme="dark"]{--bg:#0a0a0f;--bgc:#111118;--bge:#18181f;--brd:#2a2a38;--brdh:#3a3a50;--txt:#f0f0f8;--txt2:#b0b0cc;--txt3:#7070a0;}
@@ -18,6 +18,7 @@
 :root{--acc:#ff3d3d;--adim:rgba(255,61,61,.15);--aglow:rgba(255,61,61,.4);--blue:#4fc3f7;--bdim:rgba(79,195,247,.15);--orange:#ff8c42;--odim:rgba(255,140,66,.15);--red:#ff4757;--rdim:rgba(255,71,87,.15);--green:#2ecc71;--gdim:rgba(46,204,113,.15);--purple:#a78bfa;--pdim:rgba(167,139,250,.15);--r:12px;--rs:8px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--bg);color:var(--txt);font-family:'DM Sans',sans-serif;font-size:14px;overflow:hidden;transition:background .3s,color .3s;}
+.main{overflow-x:hidden!important;}
 .hidden{display:none!important;}
 
 /* BUTTONS */
@@ -492,6 +493,47 @@ select option{background:var(--bgc);}
   /* Bottom nav bar for quick access */
   #bottom-nav{display:flex!important;}
   .main{padding-bottom:70px!important;}
+
+  /* OVERFLOW FIXES - no horizontal scroll */
+  *{max-width:100%;}
+  .fim{flex-wrap:wrap!important;gap:4px!important;}
+  .we{flex-wrap:wrap!important;}
+  .wer{min-width:0!important;}
+  .wed{word-break:break-word!important;overflow-wrap:break-word!important;}
+  .ic-seg{flex-wrap:wrap!important;gap:6px!important;}
+  table{display:block!important;overflow-x:auto!important;max-width:100%!important;}
+  .sport-tabs{overflow-x:auto!important;flex-wrap:nowrap!important;padding-bottom:4px!important;}
+  .pr-grid{grid-template-columns:1fr 1fr!important;}
+  .day-snap{grid-template-columns:1fr 1fr!important;}
+  .slc{overflow-x:auto!important;}
+  .pb-wrap{overflow-x:auto!important;min-height:130px!important;}
+  .rings{gap:8px!important;}
+  .rc{padding:10px 8px!important;}
+  .rsvg{width:68px!important;height:68px!important;}
+  .rctr{top:18px!important;}
+  .rv{font-size:13px!important;}
+  .nbv{min-width:0!important;font-size:9px!important;}
+  .nbr{flex-wrap:wrap!important;gap:3px!important;}
+  .nbl{width:auto!important;min-width:70px!important;}
+  .donut-wrap{flex-wrap:wrap!important;justify-content:center!important;}
+  .hyd{flex-wrap:wrap!important;}
+  .wday-lbl{font-size:9px!important;}
+  .we{padding:10px!important;}
+  .ai-ch{height:300px!important;}
+  .gram-macros{grid-template-columns:1fr 1fr!important;}
+  .fav-grid{overflow-x:hidden!important;}
+  .fav-chip{max-width:100%!important;white-space:normal!important;}
+  .ic-tot-t{font-size:28px!important;}
+  .cd-num{font-size:30px!important;}
+  .bal-n{font-size:34px!important;}
+  .bmr-n{font-size:36px!important;}
+  .missing-wrap .miss-item{font-size:11px!important;}
+  .tg{flex-wrap:wrap!important;}
+  .ph h1{font-size:28px!important;}
+  input[type=range]{max-width:100%!important;}
+  .fr.g3{grid-template-columns:1fr 1fr!important;}
+  .nbf{min-width:0!important;}
+  pre,code{white-space:pre-wrap!important;word-break:break-all!important;}
 }
 
 /* Bottom navigation bar (mobile only) */
@@ -631,6 +673,12 @@ select option{background:var(--bgc);}
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg>
         <span>Světlý/tmavý</span>
       </button>
+      <button class="nb" onclick="syncFromCloud()" style="margin-top:3px">
+        <svg viewBox="0 0 24 24"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        <span>Synchronizovat</span>
+      </button>
+      <div style="padding:5px 11px;font-size:10px;color:var(--txt3)" id="sync-status">☁️ Čeká</div>
+      <div style="padding:0 11px 4px;font-size:9px;color:var(--txt3)" id="sync-time"></div>
     </div>
   </nav>
 
@@ -782,6 +830,28 @@ select option{background:var(--bgc);}
             <button class="btn-o" onclick="saveAsFav()" title="Uložit jako oblíbené">⭐ Uložit oblíbené</button>
             <button class="btn-o" onclick="closeMod('food-mod')">Zrušit</button>
             <button class="btn" onclick="saveFoodItem()">Přidat jídlo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK CALORIES -->
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <span class="ch" style="margin:0">⚡ Rychlé kalorie</span>
+          <span style="font-size:11px;color:var(--txt2)">bez zadání jídla</span>
+        </div>
+        <p style="font-size:12px;color:var(--txt2);margin-bottom:10px">Přidej odhadované kalorie přímo — kombinuje se s kaloriemi ze zapsaných jídel.</p>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+          <input type="number" id="qcal-in" placeholder="např. 2000" style="width:120px" min="0" max="9999">
+          <span style="color:var(--txt2);font-size:12px">kcal</span>
+          <button class="btn" onclick="addQuickCals()">+ Přidat</button>
+          <button class="btn-o" onclick="resetQuickCals()">Resetovat</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="background:var(--adim);border:1px solid var(--acc);border-radius:var(--rs);padding:8px 14px;display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;color:var(--txt2)">Dnes přidáno:</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:18px;color:var(--acc);font-weight:700" id="qcal-total">0</span>
+            <span style="font-size:11px;color:var(--txt2)">kcal</span>
           </div>
         </div>
       </div>
@@ -1161,7 +1231,19 @@ select option{background:var(--bgc);}
     <!-- PROFILE -->
     <section id="tab-profile" class="tab">
       <div class="ph"><h1>Profil & BMR</h1></div>
-      <div class="bmr-big"><div class="bmr-n" id="bmr-n">---</div><div class="bmr-l">BAZÁLNÍ METABOLISMUS (kcal/den)</div><div class="bmr-s" id="bmr-s"></div></div>
+      <div class="bmr-big">
+        <div class="bmr-n" id="bmr-n">---</div>
+        <div class="bmr-l">BAZÁLNÍ METABOLISMUS (kcal/den)</div>
+        <div class="bmr-s" id="bmr-s"></div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,61,61,.3)">
+          <div style="font-size:11px;color:var(--acc);margin-bottom:8px;opacity:.8">✏️ Upravit BMR ručně</div>
+          <div style="display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap">
+            <input type="number" id="bmr-edit" placeholder="např. 1850" style="width:110px;text-align:center">
+            <span style="color:var(--acc);font-size:12px">kcal/den</span>
+            <button class="btn" style="padding:7px 14px;font-size:12px" onclick="saveBMR()">Uložit BMR</button>
+          </div>
+        </div>
+      </div>
       <div class="card" style="margin-bottom:14px"><span class="ch">Osobní údaje</span><div class="g4" id="pf-stats"></div><button class="btn-o" style="margin-top:13px" onclick="showOb()">✏️ Upravit profil</button>
           <button class="btn-o" style="margin-top:8px;margin-left:8px" onclick="exportData()">💾 Exportovat data (JSON)</button>
           <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--brd)">
@@ -1177,6 +1259,92 @@ select option{background:var(--bgc);}
   </main>
 </div>
 <script>
+// ============================================================
+// SUPABASE SYNC
+// ============================================================
+const SB_URL = 'https://wclqqlbmkcifryenghsa.supabase.co';
+const SB_KEY = 'sb_publishable_-JFa4BCVS5IhQLUkqc4e6g_5VGycIQu';
+const SB_ROW = 'martin';
+let syncTimeout = null;
+let lastSyncTime = null;
+let syncStatus = 'idle';
+
+async function sbRequest(method, body) {
+  const base = SB_URL + '/rest/v1/tracker_data';
+  const url = method === 'GET' ? base + '?id=eq.' + SB_ROW : base;
+  const r = await fetch(url, {
+    method,
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'resolution=merge-duplicates' : 'return=minimal'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!r.ok) throw new Error('Supabase ' + r.status);
+  return method === 'GET' ? r.json() : true;
+}
+
+async function syncToCloud() {
+  if (!S.profile) return;
+  setSyncStatus('syncing'); updateSyncUI();
+  try {
+    await sbRequest('POST', { id: SB_ROW, data: S, updated_at: new Date().toISOString() });
+    lastSyncTime = new Date();
+    setSyncStatus('ok'); updateSyncUI();
+  } catch(e) {
+    setSyncStatus('error'); updateSyncUI();
+    console.error('Sync to cloud error:', e);
+  }
+}
+
+async function syncFromCloud() {
+  setSyncStatus('syncing'); updateSyncUI();
+  try {
+    const rows = await sbRequest('GET');
+    if (rows && rows.length > 0 && rows[0].data) {
+      const cloudData = rows[0].data;
+      const cloudTime = new Date(rows[0].updated_at);
+      const localTime = S._lastSaved ? new Date(S._lastSaved) : new Date(0);
+      if (cloudTime > localTime) {
+        S = Object.assign({}, S, cloudData);
+        fixS(); save();
+        lastSyncTime = cloudTime;
+        setSyncStatus('ok'); updateSyncUI();
+        if (S.profile) { renderDash(); renderMeals(); renderSups(); renderTrLog(); renderProfile(); renderMissing(); }
+        toast('☁️ Synchronizováno', 'Načtena nejnovější data z cloudu');
+      } else {
+        await syncToCloud();
+      }
+    } else {
+      await syncToCloud();
+    }
+  } catch(e) {
+    setSyncStatus('error'); updateSyncUI();
+    console.error('Sync from cloud error:', e);
+  }
+}
+
+function setSyncStatus(s) { syncStatus = s; }
+
+function updateSyncUI() {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  const icons = { idle:'☁️', syncing:'🔄', ok:'✅', error:'❌' };
+  const labels = { idle:'Čeká', syncing:'Synchronizuji...', ok:'Synchronizováno', error:'Chyba sync' };
+  el.textContent = icons[syncStatus] + ' ' + labels[syncStatus];
+  el.style.color = syncStatus==='ok'?'var(--green)':syncStatus==='error'?'var(--red)':syncStatus==='syncing'?'var(--orange)':'var(--txt3)';
+  const timeEl = document.getElementById('sync-time');
+  if (timeEl && lastSyncTime) timeEl.textContent = lastSyncTime.toLocaleTimeString('cs-CZ',{hour:'2-digit',minute:'2-digit'});
+}
+
+function schedulSync() {
+  if (syncTimeout) clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(() => syncToCloud(), 3000);
+}
+
+
 // ===== MOBILE SIDEBAR =====
 function toggleSidebar(){
   const sb=document.querySelector('.sb');
@@ -1272,8 +1440,13 @@ function fixS(){
   if(!S.favourites) S.favourites=[];
   if(!S.prs) S.prs={};
   if(!S.dailyHistory) S.dailyHistory={};
+  if(!S.quickCals) S.quickCals={};
 }
-function save(){localStorage.setItem('it_v9',JSON.stringify(S));}
+function save(){
+  S._lastSaved=new Date().toISOString();
+  localStorage.setItem('it_v9',JSON.stringify(S));
+  schedulSync();
+}
 
 function initApp(){
   document.getElementById('ob').classList.add('hidden');
@@ -1285,6 +1458,8 @@ function initApp(){
   genBriefing();
   startClock();
   renderMissing();
+  renderQuickCals();
+  setTimeout(syncFromCloud, 1500);
   setInterval(updateCD,60000);
   setInterval(updateGreeting,60000);
 }
@@ -1422,7 +1597,10 @@ function totals(){
     fib+=i.fiber||0;sug+=i.sugar||0;salt+=i.salt||0;
   }));
   S.supplements.forEach(s=>{if(s.taken){cal+=s.calories||0;pro+=s.protein||0;car+=s.carbs||0;fat+=s.fat||0;}});
-  return{cal:Math.round(cal),pro:Math.round(pro*10)/10,car:Math.round(car*10)/10,fat:Math.round(fat*10)/10,fib,sug,salt};
+  // Add quick calories
+  const qc=S.quickCals&&S.quickCals[today()]?S.quickCals[today()]:0;
+  cal+=qc;
+  return{cal:Math.round(cal),pro:Math.round(pro*10)/10,car:Math.round(car*10)/10,fat:Math.round(fat*10)/10,fib,sug,salt,quickCals:qc};
 }
 function trKcal(){return S.trainings.filter(t=>t.date===today()).reduce((a,t)=>a+t.kcal,0);}
 
@@ -1536,6 +1714,7 @@ function logW(){
 
 // ===== MEALS =====
 function renderMeals(){
+  renderQuickCals();
   const c=document.getElementById('meals-c');if(!c) return;
   c.innerHTML=Object.entries(S.meals).map(([key,meal])=>{
     const tot=meal.items.reduce((a,i)=>({cal:a.cal+(i.cal||0),pro:a.pro+(i.protein||0),car:a.car+(i.carbs||0),fat:a.fat+(i.fat||0)}),{cal:0,pro:0,car:0,fat:0});
@@ -1802,7 +1981,9 @@ function renderBalance(){
   const n=document.getElementById('bal-n');const l=document.getElementById('bal-l');const det=document.getElementById('bal-d');
   if(n){n.textContent=(bal>0?'+':'')+bal;n.className='bal-n '+(bal>0?'bal-pos':'bal-neg');}
   if(l) l.textContent=bal>0?'kcal surplus':'kcal deficit';
-  if(det) det.textContent=`Příjem: ${t.cal} | Cíl: ${tg} | Trénink: ${tk} kcal`;
+  const qc=t.quickCals||0;
+  const foodCal=t.cal-qc;
+  if(det) det.textContent='Jídlo: '+foodCal+(qc?' | Rychlé: '+qc:'')+' | Celkem: '+t.cal+' | Cíl: '+tg+(tk?' | Trénink: '+tk+' kcal':'');
 }
 
 // Hydro
@@ -2652,6 +2833,7 @@ function handleNewDay(prevDate){
     snap.cal+=i.cal||0;snap.pro+=i.protein||0;snap.car+=i.carbs||0;snap.fat+=i.fat||0;
   }));
   if(!S.dailyHistory) S.dailyHistory={};
+  if(!S.quickCals) S.quickCals={};
   S.dailyHistory[prevDate]=snap;
   // Reset daily data for new day
   Object.values(S.meals).forEach(m=>{m.items=[];m.checked=false;m._open=false;});
@@ -2759,6 +2941,44 @@ function doImport(e){
     }catch(err){toast('❌ Chyba',`Neplatný soubor: ${err.message}`);}
   };
   reader.readAsText(file);
+}
+
+// ===== QUICK CALORIES =====
+function addQuickCals(){
+  const v=parseInt(document.getElementById('qcal-in').value)||0;
+  if(v<=0||v>9999){toast('⚠️','Zadej hodnotu 1-9999 kcal');return;}
+  if(!S.quickCals) S.quickCals={};
+  const td=today();
+  S.quickCals[td]=(S.quickCals[td]||0)+v;
+  document.getElementById('qcal-in').value='';
+  save();renderQuickCals();updateRings();renderMeals();renderBalance();
+  toast('⚡ Přidáno',v+' kcal přidáno do denního příjmu');
+}
+function resetQuickCals(){
+  if(!confirm('Resetovat rychlé kalorie pro dnešek?')) return;
+  if(S.quickCals) S.quickCals[today()]=0;
+  save();renderQuickCals();updateRings();renderMeals();renderBalance();
+}
+function renderQuickCals(){
+  const el=document.getElementById('qcal-total');
+  if(el){
+    const v=S.quickCals&&S.quickCals[today()]?S.quickCals[today()]:0;
+    el.textContent=v;
+  }
+}
+
+function saveBMR(){
+  const val=parseInt(document.getElementById('bmr-edit').value);
+  if(!val||val<800||val>5000){toast('⚠️','BMR musí být 800-5000 kcal');return;}
+  if(!S.profile) return;
+  S.profile.bmr=val;
+  S.profile.tdee=Math.round(val*1.55);
+  const cal=S.profile.tdee+(S.profile.plan==='cut'?-400:S.profile.plan==='bulk'?300:0);
+  if(!S.customTargets){
+    S.profile.targets={calories:cal,protein:Math.round((S.profile.weight||75)*2.2),carbs:Math.round(cal*0.45/4),fat:Math.round(cal*0.25/9),fiber:35};
+  }
+  save();renderProfile();updateRings();
+  toast('✅ BMR uložen','Nový BMR: '+val+' kcal/den · TDEE: '+S.profile.tdee+' kcal/den');
 }
 // ===== HELPERS =====
 function today(){return new Date().toISOString().split('T')[0];}
