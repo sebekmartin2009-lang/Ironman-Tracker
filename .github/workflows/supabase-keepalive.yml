@@ -1,0 +1,17 @@
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "17 6 */3 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read tracker row (counts as Supabase activity)
+        run: |
+          curl --fail --silent --show-error --retry 3 --retry-delay 20 --retry-all-errors \
+            -H "apikey: sb_publishable_-JFa4BCVS5IhQLUkqc4e6g_5VGycIQu" \
+            -H "Authorization: Bearer sb_publishable_-JFa4BCVS5IhQLUkqc4e6g_5VGycIQu" \
+            "https://wclqqlbmkcifryenghsa.supabase.co/rest/v1/tracker_data?id=eq.martin&select=id,updated_at"
